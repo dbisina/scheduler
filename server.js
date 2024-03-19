@@ -1,17 +1,30 @@
 const express = require('express');
-const bodyParser = require('body-parser'); // Example middleware for parsing request bodies
+const firebase = require('firebase/app');
+require('firebase/firestore');
 
 const app = express();
-app.use(bodyParser.json()); // Parse incoming JSON data
 
-app.get('/', (req, res) => {
-  res.send('Hello from the backend!');
+
+firebase.initializeApp({
+    apiKey: "AIzaSyBq0N2cviz-ki6CkzC6Ti009QPcHLPmyzA",
+    authDomain: "scheduler-f505c.firebaseapp.com",
+    projectId: "scheduler-f505c",
+    storageBucket: "scheduler-f505c.appspot.com",
+    messagingSenderId: "1098147948175",
+    appId: "1:1098147948175:web:3f2a12fac158e6b853f2fa",
+    measurementId: "G-R95N9NBGKZ"
 });
 
-app.post('/courses', (req, res) => {
-  // Implement logic to receive and store course data from React app (e.g., using a database)
-  console.log('Received course data:', req.body);
-  res.send('Course added successfully!');
+const db = firebase.firestore();
+
+app.post('/courses', async (req, res) => {
+  try {
+    await db.collection('courses').add(req.body);
+    res.send('Course added successfully!');
+  } catch (error) {
+    console.error('Error adding course:', error);
+    res.status(500).send('Error adding course');
+  }
 });
 
 app.listen(3000, () => {

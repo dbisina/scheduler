@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { addDoc, collection } from 'firebase/firestore';
+import {db} from '../../config/firebaseConfig/'
 
 const CourseInput = () => {
   const [courseData, setCourseData] = useState({
@@ -12,13 +14,19 @@ const CourseInput = () => {
     setCourseData({ ...courseData, [event.target.name]: event.target.value });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Handle form submission logic (store course data)
-    setCourseData({ title: '', platform: '', difficulty: '', estimatedTime: 0 });
-  };
+    try {
+        const courseCollection = collection(db, 'courses');
+        const docRef = await addDoc(courseCollection, courseData);
+        console.log('Course saved successfully! Doc ID:', docRef.id);
+        setCourseData({ title: '', platform: '', difficulty: '', estimatedTime: 0 });
+      } catch (error) {
+        console.error('Error adding course:', error);
+      }
+    };
 
-  return (
+    return (
     <div className="course-input container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-4">Add Your Courses</h2>
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
@@ -78,3 +86,11 @@ const CourseInput = () => {
           type="submit"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md"
         >
+          Add Course
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default CourseInput;
